@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бонусы — Кабинет покупателя DNS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* --- DS tokens (из Figma) --- */
+    --bg-primary:#f7f7f7;
+    --bg-secondary:#ffffff;
+    --bg-input:#f7f7f7;
+    --bg-brand-dark:#fc8507;
+    --text-primary:#333333;
+    --text-secondary:#4e4e4e;
+    --text-tertiary:#7d7c7c;
+    --text-placeholder:#8c8c8c;
+    --text-link:#007de3;
+    --icon-primary:#a7a5a5;        /* Icon/Primary — иконки в дефолте */
+    --icon-selected:#333333;       /* Icon/Selected — активные иконки, монеты */
+    --icon-success-dark:#30b25d;
+    --stroke-light:#eeeeee;
+    --stroke-indicator:#f7f7f7;
+    /* Gradient/Primary Button + hover/pressed (controls-hover-orange) */
+    --btn-gradient:linear-gradient(116.54deg,#fc8507 3.97%,#ffa218 102.81%);
+    --btn-gradient-hover:linear-gradient(116.54deg,#ff9741 3.97%,#ffb14a 102.81%);
+    --btn-gradient-active:linear-gradient(116.54deg,#f07d05 3.97%,#f59512 102.81%);
+    --btn-orange-shadow:0px 4px 12px 0px rgba(252,133,7,0.2);
+    --controls-hover-gray:#eae8e8;
+    --controls-active-gray:#e0dede;
+    --gray-shadow:0px 2px 8px 0px rgba(0,0,0,0.06);
+
+    /* radii */
+    --r-sm:8px;
+    --r-lg:16px;
+
+    /* spaces */
+    --s-tiny:4px;
+    --s-small:8px;
+    --s-medium:12px;
+    --s-large:16px;
+    --s-xxl:24px;
+
+    /* shadows */
+    --shadow-header:0px 1px 8px 0px rgba(0,0,0,0.08);
+    --shadow-plate:0px 1px 2px 0px rgba(0,0,0,0.1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'PT Sans',sans-serif;
+    background:#e6e6e6;
+    color:var(--text-primary);
+    display:flex;
+    justify-content:center;
+    min-height:100vh;
+    padding:24px 0;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* --- иконки: фикс-бокс, img центрируется с явным px-размером (bbox из Figma) --- */
+  .ic{position:relative;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
+  .ic img{display:block;max-width:none;}
+  .coin{position:relative;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
+  .coin img{display:block;max-width:none;}
+
+  /* --- Mobile frame --- */
+  .screen{
+    width:376px;
+    background:var(--bg-primary);
+    display:flex;
+    flex-direction:column;
+    gap:var(--s-large);
+    padding-bottom:var(--s-xxl);
+    overflow:hidden;
+  }
+
+  /* --- Header --- */
+  .header{
+    background:var(--bg-secondary);
+    box-shadow:var(--shadow-header);
+    padding:var(--s-medium) 0;
+  }
+  .header__bottom{
+    display:flex;
+    gap:var(--s-small);
+    align-items:center;
+    padding:0 var(--s-large);
+  }
+  .icon-btn{
+    width:36px;height:36px;
+    min-width:36px;
+    background:var(--bg-primary);
+    border-radius:var(--r-sm);
+    border:none;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    position:relative;
+    flex-shrink:0;
+  }
+  .search-field{
+    flex:1;
+    min-width:0;
+    background:var(--bg-input);
+    border-radius:var(--r-sm);
+    height:36px;
+    display:flex;
+    align-items:center;
+    gap:var(--s-small);
+    padding:var(--s-small);
+  }
+  .search-field span{
+    font-size:14px;
+    line-height:1.3;
+    color:var(--text-placeholder);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .notif-badge{
+    position:absolute;
+    top:6px;right:6px;
+    width:8px;height:8px;
+    background:var(--bg-brand-dark);
+    border:2px solid var(--stroke-indicator);
+    border-radius:50%;
+  }
+
+  /* --- Body container --- */
+  .container{
+    display:flex;
+    flex-direction:column;
+    gap:var(--s-large);
+    padding:0 var(--s-large);
+  }
+  .page-title{
+    font-size:24px;
+    font-weight:700;
+    line-height:1.3;
+    color:var(--text-primary);
+  }
+
+  /* --- White content plate --- */
+  .plate{
+    background:var(--bg-secondary);
+    border-radius:var(--r-lg);
+    box-shadow:var(--shadow-plate);
+    padding:var(--s-xxl) var(--s-medium);
+    display:flex;
+    flex-direction:column;
+    gap:var(--s-large);
+  }
+
+  /* --- Gray inner card --- */
+  .card{
+    background:var(--bg-primary);
+    border-radius:var(--r-sm);
+    padding:var(--s-large);
+  }
+
+  .balance{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:var(--s-medium);
+  }
+  .balance__label{
+    font-size:14px;
+    line-height:1.3;
+    color:var(--text-tertiary);
+    margin-bottom:var(--s-tiny);
+    display:flex;
+    align-items:center;
+    gap:var(--s-tiny);
+  }
+  .balance__value{
+    font-size:18px;
+    font-weight:700;
+    line-height:1.3;
+    display:flex;
+    align-items:center;
+    gap:2px;
+  }
+
+  .inactive{display:flex;flex-direction:column;gap:var(--s-tiny);}
+
+  .meta{
+    font-size:16px;
+    line-height:1.4;
+    color:var(--text-primary);
+  }
+  .meta p{margin-bottom:var(--s-tiny);}
+  .meta p:last-child{margin-bottom:0;}
+
+  /* --- Klubkoin card --- */
+  .card--klub{position:relative;display:flex;flex-direction:column;gap:var(--s-large);}
+  .klub-logo{position:absolute;top:16px;right:16px;width:47px;height:47px;}
+
+  /* --- Primary button --- */
+  .btn{
+    border:none;
+    border-radius:var(--r-lg);
+    font-family:inherit;
+    /* Body/Paragraph (18px): PT Sans Regular 18 / lh 1.3 */
+    font-size:18px;
+    font-weight:400;
+    line-height:1.3;
+    cursor:pointer;
+    padding:20px var(--s-large);
+    width:100%;
+    text-align:center;
+    transition:background .15s ease, box-shadow .15s ease;
+  }
+  .btn--primary{background:var(--btn-gradient);color:#fff;}
+  .btn--primary:hover{background:var(--btn-gradient-hover);box-shadow:var(--btn-orange-shadow);}
+  .btn--primary:active{background:var(--btn-gradient-active);box-shadow:none;}
+  .btn--secondary{background:var(--bg-primary);color:var(--text-primary);}
+  .btn--secondary:hover{background:var(--controls-hover-gray);box-shadow:var(--gray-shadow);}
+  .btn--secondary:active{background:var(--controls-active-gray);box-shadow:none;}
+
+  .hint{display:flex;flex-direction:column;gap:var(--s-tiny);}
+  .hint p{font-size:16px;line-height:1.4;color:var(--text-primary);}
+  .link{
+    display:flex;
+    align-items:center;
+    gap:var(--s-tiny);
+    color:var(--text-link);
+    font-size:16px;
+    line-height:1.4;
+    text-decoration:none;
+  }
+
+  /* --- Table --- */
+  .table{display:flex;flex-direction:column;gap:var(--s-large);}
+  .table__title{font-size:16px;font-weight:700;line-height:1.3;}
+  .table__inner{border-radius:var(--r-lg);overflow:hidden;}
+  .table__head{
+    background:var(--bg-primary);
+    display:flex;
+    justify-content:space-between;
+    padding:var(--s-medium) var(--s-large);
+    font-size:16px;
+    line-height:1.4;
+    color:var(--text-secondary);
+  }
+  .table__body{
+    border:1px solid var(--stroke-light);
+    border-radius:0 0 var(--r-lg) var(--r-lg);
+  }
+  .row{
+    background:var(--bg-secondary);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    padding:var(--s-medium) var(--s-large);
+    border-bottom:1px solid var(--stroke-light);
+  }
+  .row:last-child{border-bottom:none;}
+  .row__order{display:flex;flex-direction:column;gap:var(--s-tiny);}
+  .row__order .num{font-size:16px;line-height:1.4;color:var(--text-primary);}
+  .row__order .date{font-size:14px;line-height:1.3;color:var(--text-tertiary);}
+  .row__amount{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+  .amount-line{display:flex;align-items:center;gap:var(--s-tiny);}
+  .amount{font-size:16px;font-weight:700;line-height:1.3;text-align:right;}
+  .amount--plus{color:var(--icon-success-dark);}
+  .amount--minus{color:var(--text-tertiary);}
+  .row__note{font-size:14px;line-height:1.3;color:var(--text-tertiary);text-align:right;}
+</style>
+</head>
+<body>
+  <div class="screen">
+
+    <!-- ===== Header ===== -->
+    <header class="header">
+      <div class="header__bottom">
+        <button class="icon-btn" aria-label="Назад">
+          <span class="ic" style="width:20px;height:20px">
+            <img src="assets/arrow-left.svg" style="width:12.35px;height:10.77px" alt="">
+          </span>
+        </button>
+
+        <div class="search-field">
+          <span class="ic" style="width:18px;height:18px">
+            <img src="assets/search.svg" style="width:13.37px;height:13.37px" alt="">
+          </span>
+          <span>Поиск по сайту</span>
+        </div>
+
+        <button class="icon-btn" aria-label="Чат">
+          <span class="ic" style="width:20px;height:20px">
+            <img src="assets/chat.svg" style="width:15.42px;height:14.10px" alt="">
+          </span>
+          <span class="notif-badge"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== Body ===== -->
+    <div class="container">
+      <h1 class="page-title">Бонусы</h1>
+
+      <section class="plate">
+
+        <!-- ProZaPass balance card -->
+        <div class="card">
+          <div class="balance">
+            <div>
+              <div class="balance__label">ProZaPass</div>
+              <div class="balance__value">2 000
+                <span class="coin" style="width:18px;height:18px">
+                  <img src="assets/coin-union.svg" style="width:12px;height:12.75px" alt="">
+                </span>
+              </div>
+            </div>
+            <!-- big ProZaPass logo: orange circle + white glyph -->
+            <span class="coin" style="width:47px;height:47px;display:block;position:relative">
+              <img src="assets/pzp-ellipse.svg" style="position:absolute;left:0;top:0;width:47px;height:47px" alt="">
+              <img src="assets/pzp-logo-union.svg" style="position:absolute;left:13.83px;top:13.63px;width:19.33px;height:20.54px" alt="">
+            </span>
+          </div>
+
+          <div class="inactive">
+            <div class="balance__label">
+              Неактивные бонусы
+              <span class="ic" style="width:20px;height:20px">
+                <img src="assets/info-circle.svg" style="width:16.67px;height:16.67px" alt="">
+              </span>
+            </div>
+            <div class="balance__value">+100
+              <span class="coin" style="width:18px;height:18px">
+                <img src="assets/coin-union.svg" style="width:12px;height:12.75px" alt="">
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card meta -->
+        <div class="meta">
+          <p>Использовать до: 28.03.2021</p>
+          <p>Карта привязана к номеру:</p>
+          <p>+7 (924) 725-87-76</p>
+        </div>
+
+        <!-- Klubkoin card -->
+        <div class="card card--klub">
+          <div>
+            <div class="balance__label">Клубкоины</div>
+            <div class="balance__value">1 000
+              <span class="coin" style="width:18px;height:18px">
+                <img src="assets/clubcoin-sm.svg" style="inset:0;width:18px;height:18px" alt="">
+              </span>
+            </div>
+          </div>
+          <span class="klub-logo">
+            <img src="assets/clubcoin-logo.svg" style="width:47px;height:47px;display:block" alt="">
+          </span>
+          <button class="btn btn--primary">Перевести в PZP</button>
+        </div>
+
+        <!-- Hint -->
+        <div class="hint">
+          <p>Клубкоины можно перевести в бонусы ProZaPass</p>
+          <a class="link" href="#">Подробнее про клубкоины
+            <span class="ic" style="width:20px;height:20px">
+              <img src="assets/arrow-up-right.svg" style="width:9.10px;height:9.10px" alt="">
+            </span>
+          </a>
+        </div>
+
+        <!-- Table -->
+        <div class="table">
+          <div class="table__title">Последние операции по карте ProZaPass</div>
+          <div class="table__inner">
+            <div class="table__head">
+              <span>Заказ/дата</span>
+              <span>Начислено/Списано</span>
+            </div>
+            <div class="table__body">
+
+              <div class="row">
+                <div class="row__order"><span class="num">А-01468894</span><span class="date">28.08.2020</span></div>
+                <div class="row__amount">
+                  <div class="amount-line">
+                    <span class="amount amount--plus">+ 100</span>
+                    <span class="ic" style="width:24px;height:24px">
+                      <img src="assets/clock.svg" style="width:20px;height:20px" alt="">
+                    </span>
+                  </div>
+                  <span class="row__note">через 3 дня</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="row__order"><span class="num">А-01468894</span><span class="date">28.08.2020</span></div>
+                <div class="row__amount"><div class="amount-line"><span class="amount amount--plus">+ 500</span></div></div>
+              </div>
+
+              <div class="row">
+                <div class="row__order"><span class="num">А-01468894</span><span class="date">28.08.2020</span></div>
+                <div class="row__amount"><div class="amount-line"><span class="amount amount--plus">+ 200</span></div></div>
+              </div>
+
+              <div class="row">
+                <div class="row__order"><span class="num">А-01468894</span><span class="date">28.08.2020</span></div>
+                <div class="row__amount"><div class="amount-line"><span class="amount amount--minus">- 100</span></div></div>
+              </div>
+
+              <div class="row">
+                <div class="row__order"><span class="num">А-01468894</span><span class="date">28.08.2020</span></div>
+                <div class="row__amount"><div class="amount-line"><span class="amount amount--plus">+ 1 000</span></div></div>
+              </div>
+
+              <div class="row">
+                <div class="row__order"><span class="num">А-01468894</span><span class="date">28.08.2020</span></div>
+                <div class="row__amount"><div class="amount-line"><span class="amount amount--plus">+ 400</span></div></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Show more -->
+        <button class="btn btn--secondary">Показать ещё</button>
+
+      </section>
+    </div>
+  </div>
+</body>
+</html>
