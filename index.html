@@ -21,6 +21,7 @@
     --text-link:#007de3;
     --icon-primary:#a7a5a5;        /* Icon/Primary — иконки в дефолте */
     --icon-selected:#333333;       /* Icon/Selected — активные иконки, монеты */
+    --icon-brand-main:#ffa319;     /* Icon/Brand-main — бейдж, непрочитанные */
     --icon-success-dark:#30b25d;
     --stroke-light:#eeeeee;
     --stroke-indicator:#f7f7f7;
@@ -76,6 +77,7 @@
     gap:var(--s-large);
     padding-bottom:var(--s-xxl);
     overflow:hidden;
+    position:relative;     /* контейнер для fullscreen-модалки */
   }
 
   /* --- Header --- */
@@ -268,6 +270,139 @@
   .amount--plus{color:var(--icon-success-dark);}
   .amount--minus{color:var(--text-tertiary);}
   .row__note{font-size:14px;line-height:1.3;color:var(--text-tertiary);text-align:right;}
+
+  /* ===== Центр уведомлений — fullscreen mobile modal (UFO size:full, color:white) ===== */
+  .modal{
+    position:absolute;
+    inset:0;
+    background:var(--bg-primary);
+    display:flex;
+    flex-direction:column;
+    z-index:50;
+    transform:translateY(100%);
+    visibility:hidden;
+    transition:transform .28s ease, visibility .28s ease;
+  }
+  .modal.open{transform:translateY(0);visibility:visible;}
+
+  /* Modal header (white, нижняя граница) */
+  .m-header{
+    background:var(--bg-secondary);
+    border-bottom:1px solid var(--stroke-light);
+    display:flex;
+    align-items:center;
+    gap:var(--s-small);
+    padding:var(--s-large);
+    flex-shrink:0;
+  }
+  .m-header__title{
+    flex:1;min-width:0;
+    font-size:20px;font-weight:700;line-height:1.3;
+    color:var(--text-primary);text-align:center;
+  }
+  .m-iconbtn{
+    background:none;border:none;cursor:pointer;padding:0;
+    width:24px;height:24px;flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:6px;transition:background .15s ease;
+  }
+  .m-iconbtn:hover{background:rgba(0,0,0,0.04);}
+
+  /* Scroll body */
+  .m-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+
+  /* Tabs */
+  .m-tabs{
+    display:flex;gap:var(--s-small);
+    padding:var(--s-large);
+    position:sticky;top:0;z-index:2;
+    background:var(--bg-primary);
+  }
+  .tab{
+    flex:1;min-width:0;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:8px 12px;border-radius:8px;border:none;cursor:pointer;
+    font-family:inherit;font-size:16px;line-height:20px;font-weight:400;
+    color:var(--text-primary);background:rgba(0,0,0,0.03);
+    transition:background .15s ease, box-shadow .15s ease;
+  }
+  .tab:hover{background:rgba(0,0,0,0.06);}
+  .tab--active{
+    background:var(--bg-secondary);font-weight:700;
+    box-shadow:0px 5px 14px 0px rgba(0,0,0,0.11),0px 2px 1px 0px rgba(0,0,0,0.05);
+  }
+  .tab--active:hover{background:var(--bg-secondary);}
+  .tab__badge{
+    background:var(--icon-brand-main);color:#fff;
+    font-weight:700;font-size:13px;line-height:1;
+    padding:2px 4px;border-radius:50px;
+  }
+
+  /* Date row + trash */
+  .m-daterow{display:flex;align-items:center;justify-content:space-between;padding:0 var(--s-large);}
+  .m-date{font-size:14px;line-height:20px;color:var(--text-tertiary);}
+  .m-trash{
+    background:none;cursor:pointer;padding:8px;
+    border-top:1px solid var(--stroke-light);
+    border-bottom:1px solid var(--stroke-light);
+    border-left:none;border-right:none;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:opacity .15s ease;
+  }
+  .m-trash:hover{opacity:.6;}
+
+  /* Notification list */
+  .m-list{display:flex;flex-direction:column;gap:12px;padding:12px var(--s-large) var(--s-xxl);}
+
+  .ncard{
+    background:var(--bg-secondary);
+    border-radius:12px;
+    box-shadow:0px 1px 1px 0px rgba(0,0,0,0.1);
+    padding:20px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .ncard__header{display:flex;align-items:flex-start;gap:8px;}
+  .ncard__title{font-size:14px;line-height:1.2;color:var(--text-primary);}
+  .ncard__dot{width:6px;height:6px;border-radius:50%;background:var(--icon-brand-main);margin-top:6px;flex-shrink:0;}
+  .ncard__close{
+    margin-left:auto;background:none;border:none;cursor:pointer;padding:0;
+    width:20px;height:20px;flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:4px;transition:background .15s ease;
+  }
+  .ncard__close:hover{background:rgba(0,0,0,0.05);}
+  .ncard__body{display:flex;gap:12px;align-items:flex-start;}
+  .ncard__text{font-size:14px;line-height:20px;color:var(--text-primary);}
+  .ncard__text--link{color:var(--text-link);}
+  .ncard__thumb{
+    width:48px;height:48px;flex-shrink:0;
+    border-radius:8px;padding:4px;background:#fff;
+    box-shadow:inset 0px 4px 250px 0px rgba(0,0,0,0.04);
+  }
+  .ncard__thumb img{width:40px;height:40px;object-fit:cover;display:block;border-radius:4px;}
+  .ncard__link{
+    display:inline-flex;align-items:center;gap:4px;
+    color:var(--text-link);font-size:14px;line-height:20px;text-decoration:none;cursor:pointer;
+  }
+  .ncard__link:hover{text-decoration:underline;}
+  /* White (tertiary) button — UFO color:white size:medium */
+  .btn-white{
+    align-self:flex-start;
+    background:#fff;border:1px solid var(--stroke-light);
+    border-radius:12px;cursor:pointer;font-family:inherit;
+    font-size:14px;line-height:20px;color:var(--text-primary);
+    padding:8px 16px;transition:background .15s ease, box-shadow .15s ease;
+  }
+  .btn-white:hover{background:var(--controls-hover-gray);box-shadow:var(--gray-shadow);}
+  .btn-white:active{background:var(--controls-active-gray);box-shadow:none;}
+
+  /* Empty state (вкладка Сообщения) */
+  .m-empty{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:40px var(--s-large);text-align:center;
+    color:var(--text-tertiary);font-size:14px;line-height:20px;
+  }
+  .m-hidden{display:none;}
 </style>
 </head>
 <body>
@@ -289,7 +424,7 @@
           <span>Поиск по сайту</span>
         </div>
 
-        <button class="icon-btn" aria-label="Чат">
+        <button class="icon-btn" id="notifBtn" aria-label="Уведомления">
           <span class="ic" style="width:20px;height:20px">
             <img src="assets/chat.svg" style="width:15.42px;height:14.10px" alt="">
           </span>
@@ -427,6 +562,133 @@
 
       </section>
     </div>
+
+    <!-- ===== Центр уведомлений (fullscreen mobile modal) ===== -->
+    <div class="modal" id="notifModal" role="dialog" aria-modal="true" aria-label="Центр уведомлений">
+
+      <!-- Modal header -->
+      <div class="m-header">
+        <button class="m-iconbtn" aria-label="Ещё">
+          <img src="assets/notif/dots.svg" style="width:18.04px;height:2.81px" alt="">
+        </button>
+        <span class="m-header__title">Центр уведомлений</span>
+        <button class="m-iconbtn" id="notifClose" aria-label="Закрыть">
+          <img src="assets/notif/close-header.svg" style="width:12.17px;height:12.16px" alt="">
+        </button>
+      </div>
+
+      <!-- Scroll body -->
+      <div class="m-body">
+
+        <!-- Tabs -->
+        <div class="m-tabs">
+          <button class="tab" data-tab="messages">Сообщения</button>
+          <button class="tab tab--active" data-tab="notifs">Уведомления <span class="tab__badge">15</span></button>
+        </div>
+
+        <!-- Панель: Уведомления -->
+        <div id="panel-notifs">
+          <div class="m-daterow">
+            <span class="m-date">10 марта 2021</span>
+            <button class="m-trash" id="clearAll" aria-label="Очистить всё">
+              <img src="assets/notif/trash.svg" style="width:17.5px;height:19.5px" alt="">
+            </button>
+          </div>
+
+          <div class="m-list" id="notifList">
+
+            <!-- Карточка 1 -->
+            <div class="ncard">
+              <div class="ncard__header">
+                <span class="ncard__title">Важная новость</span>
+                <span class="ncard__dot"></span>
+                <button class="ncard__close" aria-label="Скрыть">
+                  <img src="assets/notif/close.svg" style="width:10.14px;height:10.14px" alt="">
+                </button>
+              </div>
+              <div class="ncard__body">
+                <p class="ncard__text">Уважаемые покупатели! Изменилась схема организации дорожного движения от Партизанского проспект (район ДКЖД) до пересечения улицы...</p>
+              </div>
+              <a class="ncard__link">Читать далее
+                <img src="assets/notif/chevron-down.svg" style="width:9.57px;height:5.29px" alt="">
+              </a>
+            </div>
+
+            <!-- Карточка 2 -->
+            <div class="ncard">
+              <div class="ncard__header">
+                <span class="ncard__title">Ваш отзыв оценили</span>
+                <span class="ncard__dot"></span>
+                <button class="ncard__close" aria-label="Скрыть">
+                  <img src="assets/notif/close.svg" style="width:10.14px;height:10.14px" alt="">
+                </button>
+              </div>
+              <div class="ncard__body">
+                <span class="ncard__thumb"><img src="assets/notif/thumb1.png" alt=""></span>
+                <p class="ncard__text ncard__text--link">8" Планшет Huawei MediaPad T3 16 ГБ 3G, LTE серый</p>
+              </div>
+            </div>
+
+            <!-- Дата -->
+            <div class="m-daterow"><span class="m-date">9 марта 2021</span></div>
+
+            <!-- Карточка 3 -->
+            <div class="ncard">
+              <div class="ncard__header">
+                <span class="ncard__title">Ранее вы оценивали товар</span>
+                <span class="ncard__dot"></span>
+                <button class="ncard__close" aria-label="Скрыть">
+                  <img src="assets/notif/close.svg" style="width:10.14px;height:10.14px" alt="">
+                </button>
+              </div>
+              <div class="ncard__body">
+                <span class="ncard__thumb"><img src="assets/notif/thumb2.png" alt=""></span>
+                <p class="ncard__text"><span class="ncard__text--link">8" Планшет Huawei MediaPad T3 16 ГБ 3G, LTE серый</span>, возможно, вам есть что рассказать.</p>
+              </div>
+              <button class="btn-white">Оценить товар</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Панель: Сообщения (empty state) -->
+        <div id="panel-messages" class="m-hidden">
+          <div class="m-empty">Новых сообщений нет</div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
+
+  <script>
+    (function(){
+      var modal = document.getElementById('notifModal');
+      document.getElementById('notifBtn').addEventListener('click', function(){ modal.classList.add('open'); });
+      document.getElementById('notifClose').addEventListener('click', function(){ modal.classList.remove('open'); });
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape') modal.classList.remove('open'); });
+
+      // Переключение табов
+      var tabs = modal.querySelectorAll('.tab');
+      var panels = { notifs: document.getElementById('panel-notifs'), messages: document.getElementById('panel-messages') };
+      tabs.forEach(function(t){
+        t.addEventListener('click', function(){
+          tabs.forEach(function(x){ x.classList.remove('tab--active'); });
+          t.classList.add('tab--active');
+          Object.keys(panels).forEach(function(k){ panels[k].classList.toggle('m-hidden', k !== t.dataset.tab); });
+        });
+      });
+
+      // Скрытие отдельной карточки
+      modal.querySelectorAll('.ncard__close').forEach(function(btn){
+        btn.addEventListener('click', function(){ btn.closest('.ncard').remove(); });
+      });
+
+      // Очистить всё
+      document.getElementById('clearAll').addEventListener('click', function(){
+        document.getElementById('notifList').querySelectorAll('.ncard').forEach(function(c){ c.remove(); });
+      });
+    })();
+  </script>
 </body>
 </html>
