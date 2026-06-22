@@ -279,11 +279,11 @@
     display:flex;
     flex-direction:column;
     z-index:50;
-    transform:translateY(100%);
+    transform:translateX(-100%);
     visibility:hidden;
     transition:transform .28s ease, visibility .28s ease;
   }
-  .modal.open{transform:translateY(0);visibility:visible;}
+  .modal.open{transform:translateX(0);visibility:visible;}
 
   /* Modal header (white, нижняя граница) */
   .m-header{
@@ -568,9 +568,7 @@
 
       <!-- Modal header -->
       <div class="m-header">
-        <button class="m-iconbtn" aria-label="Ещё">
-          <img src="assets/notif/dots.svg" style="width:18.04px;height:2.81px" alt="">
-        </button>
+        <span style="width:24px;flex-shrink:0" aria-hidden="true"></span>
         <span class="m-header__title">Центр уведомлений</span>
         <button class="m-iconbtn" id="notifClose" aria-label="Закрыть">
           <img src="assets/notif/close-header.svg" style="width:12.17px;height:12.16px" alt="">
