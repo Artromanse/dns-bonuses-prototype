@@ -57,9 +57,10 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{
     font-family:'PT Sans',sans-serif;
-    background:#e6e6e6;
+    background:#c8c8c8;
     color:var(--text-primary);
     display:flex;
+    align-items:center;
     justify-content:center;
     min-height:100vh;
     padding:24px 0;
@@ -72,17 +73,55 @@
   .coin{position:relative;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
   .coin img{display:block;max-width:none;}
 
+  /* --- Phone shell (имитация корпуса телефона) --- */
+  .phone{
+    width:390px;
+    height:844px;           /* iPhone 14 viewport */
+    border-radius:50px;
+    background:#1a1a1a;
+    padding:12px;
+    box-shadow:
+      0 0 0 1px #3a3a3a,
+      0 30px 80px rgba(0,0,0,0.5),
+      inset 0 0 0 1px #555;
+    flex-shrink:0;
+    position:relative;
+  }
+
+  /* Dynamic Island */
+  .phone::before{
+    content:'';
+    position:absolute;
+    top:20px;left:50%;transform:translateX(-50%);
+    width:120px;height:34px;
+    background:#1a1a1a;
+    border-radius:20px;
+    z-index:100;
+  }
+
   /* --- Mobile frame --- */
   .screen{
-    width:376px;
+    width:100%;
+    height:100%;
     background:var(--bg-primary);
     display:flex;
     flex-direction:column;
-    gap:var(--s-large);
-    padding-bottom:var(--s-xxl);
-    overflow:hidden;
-    position:relative;     /* контейнер для fullscreen-модалки */
+    border-radius:40px;
+    overflow:hidden;         /* клипает содержимое по скруглённым углам */
+    position:relative;       /* контейнер для модалок */
   }
+
+  /* Прокручиваемая область контента (всё кроме хедера) */
+  .scroll-body{
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    padding:var(--s-large) 0 var(--s-xxl);
+    /* скрываем нативный скроллбар — выглядит как на телефоне */
+    scrollbar-width:none;
+  }
+  .scroll-body::-webkit-scrollbar{display:none;}
 
   /* --- Header --- */
   .header{
@@ -565,6 +604,7 @@
 </style>
 </head>
 <body>
+  <div class="phone">
   <div class="screen">
 
     <!-- ===== Header ===== -->
@@ -601,6 +641,7 @@
     </header>
 
     <!-- ===== Body ===== -->
+    <div class="scroll-body">
     <div class="container">
       <h1 class="page-title">Бонусы</h1>
 
@@ -742,6 +783,7 @@
 
       </section>
     </div>
+    </div><!-- /scroll-body -->
 
     <!-- ===== Bottom Sheet: Неактивные бонусы ===== -->
     <div class="bs-overlay" id="bsOverlay" role="dialog" aria-modal="true" aria-label="Неактивные бонусы">
@@ -846,7 +888,8 @@
       </div>
     </div>
 
-  </div>
+  </div><!-- /screen -->
+  </div><!-- /phone -->
 
   <script>
     (function(){
