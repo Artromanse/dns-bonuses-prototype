@@ -514,6 +514,54 @@
     color:var(--text-tertiary);font-size:14px;line-height:20px;
   }
   .m-hidden{display:none;}
+
+  /* ===== Bottom Sheet (неактивные бонусы) ===== */
+  .bs-overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    z-index:60;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .28s ease, visibility .28s ease;
+  }
+  .bs-overlay.open{opacity:1;visibility:visible;}
+
+  .bs-sheet{
+    position:absolute;
+    bottom:0;left:0;right:0;
+    background:var(--bg-secondary);
+    border-radius:16px 16px 0 0;
+    padding:8px var(--s-xxl) var(--s-xxl);
+    display:flex;
+    flex-direction:column;
+    gap:var(--s-large);
+    transform:translateY(100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    z-index:61;
+  }
+  .bs-overlay.open .bs-sheet{transform:translateY(0);}
+
+  .bs-handle{
+    width:36px;height:4px;
+    background:#d9d9d9;
+    border-radius:2px;
+    align-self:center;
+    margin-bottom:var(--s-small);
+    flex-shrink:0;
+  }
+  .bs-title{font-size:20px;font-weight:700;line-height:1.3;color:var(--text-primary);}
+  .bs-text{font-size:16px;line-height:1.5;color:var(--text-secondary);}
+
+  /* Кнопка-иконка для info-circle */
+  .info-btn{
+    background:none;border:none;padding:0;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:50%;transition:background .15s ease;
+    width:20px;height:20px;flex-shrink:0;
+  }
+  .info-btn:hover{background:rgba(0,0,0,0.06);}
+  .info-btn:active{background:rgba(0,0,0,0.1);}
 </style>
 </head>
 <body>
@@ -579,9 +627,9 @@
           <div class="inactive">
             <div class="balance__label">
               Неактивные бонусы
-              <span class="ic" style="width:20px;height:20px">
+              <button class="info-btn" id="infoBtn" aria-label="Что такое неактивные бонусы">
                 <img src="assets/info-circle.svg" style="width:16.67px;height:16.67px" alt="">
-              </span>
+              </button>
             </div>
             <div class="balance__value">+100
               <span class="coin" style="width:18px;height:18px">
@@ -693,6 +741,15 @@
         <button class="btn btn--secondary">Показать ещё</button>
 
       </section>
+    </div>
+
+    <!-- ===== Bottom Sheet: Неактивные бонусы ===== -->
+    <div class="bs-overlay" id="bsOverlay" role="dialog" aria-modal="true" aria-label="Неактивные бонусы">
+      <div class="bs-sheet" id="bsSheet">
+        <div class="bs-handle"></div>
+        <p class="bs-title">Неактивные бонусы</p>
+        <p class="bs-text">Бонусы становятся доступными (можно использовать для получения скидки на покупку) через 15 (пятнадцать) календарных дней с момента получения товара.</p>
+      </div>
     </div>
 
     <!-- ===== Центр уведомлений (fullscreen mobile modal) ===== -->
@@ -929,6 +986,25 @@
       // Клик вне поля — закрыть выпадающий список
       document.addEventListener('click', function(e){
         if(!sField.contains(e.target)) closeDropdown();
+      });
+
+      // ===== Bottom Sheet: Неактивные бонусы =====
+      var bsOverlay = document.getElementById('bsOverlay');
+      var bsSheet   = document.getElementById('bsSheet');
+
+      function openBS(){ bsOverlay.classList.add('open'); }
+      function closeBS(){ bsOverlay.classList.remove('open'); }
+
+      document.getElementById('infoBtn').addEventListener('click', openBS);
+
+      // Клик по оверлею вне шторки — закрыть
+      bsOverlay.addEventListener('click', function(e){
+        if(!bsSheet.contains(e.target)) closeBS();
+      });
+
+      // Escape — закрыть
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') closeBS();
       });
     })();
   </script>
