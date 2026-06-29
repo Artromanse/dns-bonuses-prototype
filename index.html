@@ -254,6 +254,7 @@
 
   /* --- Primary button --- */
   .btn{
+    position:relative;
     border:none;
     border-radius:var(--r-lg);
     font-family:inherit;
@@ -267,6 +268,21 @@
     text-align:center;
     transition:background .15s ease, box-shadow .15s ease;
   }
+
+  /* --- Button state: isLoading (компонент BaseUiButton) --- */
+  .btn__spinner{display:none;}
+  .btn--loading{pointer-events:none;cursor:default;}
+  .btn--loading .btn__label{visibility:hidden;}
+  .btn--loading .btn__spinner{
+    display:block;
+    position:absolute;left:50%;top:50%;
+    width:22px;height:22px;margin:-11px 0 0 -11px;
+    border:2.5px solid rgba(255,255,255,0.45);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:btn-spin .7s linear infinite;
+  }
+  @keyframes btn-spin{to{transform:rotate(360deg);}}
   .btn--primary{background:var(--btn-gradient);color:#fff;}
   .btn--primary:hover{background:var(--btn-gradient-hover);box-shadow:var(--btn-orange-shadow);}
   .btn--primary:active{background:var(--btn-gradient-active);box-shadow:none;}
@@ -584,7 +600,10 @@
           <span class="klub-logo">
             <img src="assets/clubcoin-logo.svg" style="width:47px;height:47px;display:block" alt="">
           </span>
-          <button class="btn btn--primary" id="transferBtn">Перевести в PZP</button>
+          <button class="btn btn--primary" id="transferBtn">
+            <span class="btn__label">Перевести в PZP</span>
+            <span class="btn__spinner" aria-hidden="true"></span>
+          </button>
         </div>
 
         <!-- Hint -->
@@ -789,12 +808,20 @@
         document.getElementById('notifList').querySelectorAll('.ncard').forEach(function(c){ c.remove(); });
       });
 
-      // ===== Перевод в PZP → Alert (warning) под ссылкой =====
+      // ===== Перевод в PZP → loading 3с → Alert (warning) под ссылкой =====
       var alertEl    = document.getElementById('transferAlert');
       var transferBtn = document.getElementById('transferBtn');
       transferBtn.addEventListener('click', function(){
-        alertEl.classList.add('open');
-        alertEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+        if(transferBtn.classList.contains('btn--loading')) return;   // защита от повторного клика
+        alertEl.classList.remove('open');                            // сброс при новом запросе
+        transferBtn.classList.add('btn--loading');                   // state isLoading
+        transferBtn.setAttribute('aria-busy','true');
+        setTimeout(function(){
+          transferBtn.classList.remove('btn--loading');
+          transferBtn.removeAttribute('aria-busy');
+          alertEl.classList.add('open');
+          alertEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }, 3000);
       });
       document.getElementById('transferAlertClose').addEventListener('click', function(){
         alertEl.classList.remove('open');
