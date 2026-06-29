@@ -283,6 +283,17 @@
     animation:btn-spin .7s linear infinite;
   }
   @keyframes btn-spin{to{transform:rotate(360deg);}}
+
+  /* --- Button state: disabled (компонент BaseUiButton) --- */
+  .btn:disabled{
+    cursor:default;
+    pointer-events:none;        /* гасит hover/active */
+    box-shadow:none;
+  }
+  .btn--primary:disabled{
+    background:var(--controls-hover-gray);
+    color:var(--text-placeholder);
+  }
   .btn--primary{background:var(--btn-gradient);color:#fff;}
   .btn--primary:hover{background:var(--btn-gradient-hover);box-shadow:var(--btn-orange-shadow);}
   .btn--primary:active{background:var(--btn-gradient-active);box-shadow:none;}
@@ -819,12 +830,14 @@
         setTimeout(function(){
           transferBtn.classList.remove('btn--loading');
           transferBtn.removeAttribute('aria-busy');
+          transferBtn.disabled = true;           // запрос отправлен — кнопка disabled
           alertEl.classList.add('open');
           alertEl.scrollIntoView({behavior:'smooth', block:'nearest'});
         }, 3000);
       });
       document.getElementById('transferAlertClose').addEventListener('click', function(){
         alertEl.classList.remove('open');
+        transferBtn.disabled = false;            // закрыли alert — можно повторить
       });
 
       // ===== Поиск по сайту (ManualSearchInput) =====
