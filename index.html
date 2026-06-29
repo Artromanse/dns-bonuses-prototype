@@ -19,6 +19,10 @@
     --text-tertiary:#7d7c7c;
     --text-placeholder:#8c8c8c;
     --text-link:#007de3;
+    --text-link-hover:#fc8507;     /* Primary/Dark — hover ссылок (компонент Link) */
+    /* Alert / Background-{type}-light + -main (компонент Alert, Type=warning) */
+    --bg-warning-light:#fff7da;
+    --bg-warning-main:#ffca48;
     --icon-primary:#a7a5a5;        /* Icon/Primary — иконки в дефолте */
     --icon-selected:#333333;       /* Icon/Selected — активные иконки, монеты */
     --icon-brand-main:#ffa319;     /* Icon/Brand-main — бейдж, непрочитанные */
@@ -103,7 +107,9 @@
     position:relative;
     flex-shrink:0;
   }
+  /* --- Search input (компонент SearchInput / ManualSearchInput) --- */
   .search-field{
+    position:relative;
     flex:1;
     min-width:0;
     background:var(--bg-input);
@@ -113,14 +119,59 @@
     align-items:center;
     gap:var(--s-small);
     padding:var(--s-small);
+    border:1px solid transparent;
+    transition:border-color .15s ease, background .15s ease;
   }
-  .search-field span{
-    font-size:14px;
-    line-height:1.3;
-    color:var(--text-placeholder);
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+  .search-field:focus-within{
+    background:var(--bg-secondary);
+    border-color:var(--bg-brand-dark);
+  }
+  .search-field__btn{
+    background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .search-field__input{
+    flex:1;min-width:0;
+    border:none;background:transparent;outline:none;
+    font-family:inherit;font-size:14px;line-height:1.3;
+    color:var(--text-primary);
+  }
+  .search-field__input::placeholder{color:var(--text-placeholder);}
+  .search-field__clear{
+    background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;
+    width:18px;height:18px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:background .15s ease;
+  }
+  .search-field__clear:hover{background:var(--controls-hover-gray);}
+  .search-field__clear svg{display:block;fill:none;stroke:var(--icon-primary);stroke-width:1.6;stroke-linecap:round;}
+  .search-field__clear[hidden]{display:none;}
+
+  /* Выпадающий список подсказок */
+  .search-dropdown{
+    position:absolute;
+    top:calc(100% + 4px);left:0;right:0;
+    background:var(--bg-secondary);
+    border-radius:var(--r-sm);
+    box-shadow:var(--gray-shadow),0px 1px 8px 0px rgba(0,0,0,0.08);
+    list-style:none;
+    max-height:260px;overflow-y:auto;
+    z-index:40;
+    padding:var(--s-tiny);
+    display:none;
+  }
+  .search-dropdown.open{display:block;}
+  .search-dropdown__item{
+    display:flex;align-items:center;gap:var(--s-small);
+    padding:8px var(--s-small);
+    border-radius:6px;
+    font-size:14px;line-height:1.3;color:var(--text-primary);
+    cursor:pointer;
+  }
+  .search-dropdown__item:hover,.search-dropdown__item.active{background:var(--bg-primary);}
+  .search-dropdown__empty{
+    padding:8px var(--s-small);
+    font-size:14px;line-height:1.3;color:var(--text-tertiary);
   }
   .notif-badge{
     position:absolute;
@@ -226,14 +277,47 @@
   .hint{display:flex;flex-direction:column;gap:var(--s-tiny);}
   .hint p{font-size:16px;line-height:1.4;color:var(--text-primary);}
   .link{
-    display:flex;
+    display:inline-flex;
     align-items:center;
     gap:var(--s-tiny);
     color:var(--text-link);
     font-size:16px;
     line-height:1.4;
     text-decoration:none;
+    width:fit-content;
+    cursor:pointer;
+    transition:color .15s ease;
   }
+  .link:hover{color:var(--text-link-hover);}      /* оранжевый из компонента Link */
+  .link .link__ic{color:currentColor;}            /* inline SVG наследует цвет ссылки */
+  .link .link__ic svg{display:block;fill:currentColor;}
+
+  /* --- Alert (компонент Alert, Size=default, Type=warning) --- */
+  .alert{
+    position:relative;
+    display:none;
+    background:var(--bg-warning-light);
+    border-radius:var(--r-lg);
+    padding:var(--s-large);
+    padding-right:40px;             /* место под крестик top8/right8 + 24px */
+    gap:var(--s-large);
+  }
+  .alert.open{display:flex;}
+  .alert__text{
+    font-size:16px;
+    line-height:1.4;
+    color:var(--text-secondary);   /* Text/Secondary #4e4e4e */
+  }
+  .alert__close{
+    position:absolute;
+    top:var(--s-small);right:var(--s-small);
+    width:24px;height:24px;
+    background:none;border:none;cursor:pointer;padding:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:6px;transition:background .15s ease;
+  }
+  .alert__close:hover{background:rgba(0,0,0,0.04);}
+  .alert__close svg{display:block;fill:none;stroke:var(--icon-primary);stroke-width:1.6;stroke-linecap:round;}
 
   /* --- Table --- */
   .table{display:flex;flex-direction:column;gap:var(--s-large);}
@@ -417,11 +501,19 @@
           </span>
         </button>
 
-        <div class="search-field">
-          <span class="ic" style="width:18px;height:18px">
-            <img src="assets/search.svg" style="width:13.37px;height:13.37px" alt="">
-          </span>
-          <span>Поиск по сайту</span>
+        <div class="search-field" id="searchField">
+          <button class="search-field__btn" id="searchBtn" aria-label="Найти">
+            <span class="ic" style="width:18px;height:18px">
+              <img src="assets/search.svg" style="width:13.37px;height:13.37px" alt="">
+            </span>
+          </button>
+          <input class="search-field__input" id="searchInput" type="text"
+                 placeholder="Поиск по сайту" autocomplete="off"
+                 role="combobox" aria-expanded="false" aria-controls="searchDropdown">
+          <button class="search-field__clear" id="searchClear" aria-label="Очистить" hidden>
+            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L11 11M11 1L1 11"/></svg>
+          </button>
+          <ul class="search-dropdown" id="searchDropdown" role="listbox"></ul>
         </div>
 
         <button class="icon-btn" id="notifBtn" aria-label="Уведомления">
@@ -492,17 +584,27 @@
           <span class="klub-logo">
             <img src="assets/clubcoin-logo.svg" style="width:47px;height:47px;display:block" alt="">
           </span>
-          <button class="btn btn--primary">Перевести в PZP</button>
+          <button class="btn btn--primary" id="transferBtn">Перевести в PZP</button>
         </div>
 
         <!-- Hint -->
         <div class="hint">
           <p>Клубкоины можно перевести в бонусы ProZaPass</p>
           <a class="link" href="#">Подробнее про клубкоины
-            <span class="ic" style="width:20px;height:20px">
-              <img src="assets/arrow-up-right.svg" style="width:9.10px;height:9.10px" alt="">
+            <span class="ic link__ic" style="width:20px;height:20px">
+              <svg width="9.1" height="9.1" viewBox="0 0 9.095 9.095" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M1.11167 0.625C1.11167 0.279822 1.39149 0 1.73667 0H8.47C8.81518 0 9.095 0.279822 9.095 0.625V7.3575C9.095 7.70268 8.81518 7.9825 8.47 7.9825C8.12482 7.9825 7.845 7.70268 7.845 7.3575V2.13388L1.06694 8.91194C0.822864 9.15602 0.427136 9.15602 0.183058 8.91194C-0.0610194 8.66786 -0.0610194 8.27214 0.183058 8.02806L6.96112 1.25H1.73667C1.39149 1.25 1.11167 0.970178 1.11167 0.625Z"/>
+              </svg>
             </span>
           </a>
+        </div>
+
+        <!-- Alert (компонент Alert, Type=warning) — ответ на «Перевести в PZP» -->
+        <div class="alert" id="transferAlert" role="status">
+          <p class="alert__text">Запрос на перевод в бонусы ProZaPass находится на рассмотрении.</p>
+          <button class="alert__close" id="transferAlertClose" aria-label="Закрыть">
+            <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L11 11M11 1L1 11"/></svg>
+          </button>
         </div>
 
         <!-- Table -->
@@ -685,6 +787,108 @@
       // Очистить всё
       document.getElementById('clearAll').addEventListener('click', function(){
         document.getElementById('notifList').querySelectorAll('.ncard').forEach(function(c){ c.remove(); });
+      });
+
+      // ===== Перевод в PZP → Alert (warning) под ссылкой =====
+      var alertEl    = document.getElementById('transferAlert');
+      var transferBtn = document.getElementById('transferBtn');
+      transferBtn.addEventListener('click', function(){
+        alertEl.classList.add('open');
+        alertEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+      });
+      document.getElementById('transferAlertClose').addEventListener('click', function(){
+        alertEl.classList.remove('open');
+      });
+
+      // ===== Поиск по сайту (ManualSearchInput) =====
+      // Предзагруженные подсказки (популярные запросы) — показываются при пустом поле,
+      // по мере ввода список фильтруется по вхождению подстроки.
+      var SUGGESTIONS = [
+        'Ноутбуки','Смартфоны','Наушники беспроводные','Видеокарта','Телевизор',
+        'Клубкоины','ProZaPass','Бонусы и скидки','Статус заказа','Гарантия и сервис',
+        'Пункты выдачи','Кофемашина','Робот-пылесос','Игровая консоль'
+      ];
+
+      var sField   = document.getElementById('searchField');
+      var sInput   = document.getElementById('searchInput');
+      var sClear   = document.getElementById('searchClear');
+      var sDrop    = document.getElementById('searchDropdown');
+      var sBtn     = document.getElementById('searchBtn');
+
+      function filterSuggestions(q){
+        q = q.trim().toLowerCase();
+        if(!q) return SUGGESTIONS.slice(0, 6);          // популярные при пустом поле
+        return SUGGESTIONS.filter(function(s){ return s.toLowerCase().indexOf(q) !== -1; });
+      }
+
+      function renderDropdown(){
+        var items = filterSuggestions(sInput.value);
+        sDrop.innerHTML = '';
+        if(sInput.value.trim() && items.length === 0){
+          // нет результатов — список не выводится (по спеке ManualSearchInput),
+          // показываем короткую заглушку
+          var empty = document.createElement('li');
+          empty.className = 'search-dropdown__empty';
+          empty.textContent = 'Ничего не найдено';
+          sDrop.appendChild(empty);
+        } else {
+          items.forEach(function(name){
+            var li = document.createElement('li');
+            li.className = 'search-dropdown__item';
+            li.setAttribute('role','option');
+            li.innerHTML = '<span class="ic" style="width:16px;height:16px">'+
+                           '<img src="assets/search.svg" style="width:11.9px;height:11.9px" alt=""></span>'+
+                           '<span></span>';
+            li.querySelector('span:last-child').textContent = name;
+            li.addEventListener('mousedown', function(e){ e.preventDefault(); selectSuggestion(name); });
+            sDrop.appendChild(li);
+          });
+        }
+        openDropdown();
+      }
+
+      function openDropdown(){ sDrop.classList.add('open'); sInput.setAttribute('aria-expanded','true'); }
+      function closeDropdown(){ sDrop.classList.remove('open'); sInput.setAttribute('aria-expanded','false'); }
+
+      function selectSuggestion(name){
+        sInput.value = name;
+        sClear.hidden = false;
+        closeDropdown();
+        runSearch(name);
+      }
+
+      // «Поиск» в прототипе: подтверждаем запрос (бэкенда нет)
+      function runSearch(value){
+        value = (value || '').trim();
+        if(!value) return;
+        console.log('search', value);
+      }
+
+      sInput.addEventListener('input', function(){
+        sClear.hidden = !sInput.value.length;
+        renderDropdown();
+      });
+      sInput.addEventListener('focus', renderDropdown);
+      sInput.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){ e.preventDefault(); closeDropdown(); runSearch(sInput.value); }
+        if(e.key === 'Escape'){ closeDropdown(); sInput.blur(); }
+      });
+
+      sBtn.addEventListener('click', function(){
+        if(sInput.value.trim()){ closeDropdown(); runSearch(sInput.value); }
+        else { sInput.focus(); }
+      });
+
+      sClear.addEventListener('click', function(){
+        sInput.value = '';
+        sClear.hidden = true;
+        sInput.focus();
+        renderDropdown();
+      });
+
+      // Клик вне поля — закрыть выпадающий список
+      document.addEventListener('click', function(e){
+        if(!sField.contains(e.target)) closeDropdown();
       });
     })();
   </script>
