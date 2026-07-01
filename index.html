@@ -27,6 +27,9 @@
     --icon-selected:#333333;       /* Icon/Selected — активные иконки, монеты */
     --icon-brand-main:#ffa319;     /* Icon/Brand-main — бейдж, непрочитанные */
     --icon-success-dark:#30b25d;
+    --text-brand:#fc8507;          /* Text/brand — счётчик непрочитанных в центре уведомлений */
+    --bg-disabled:#eae8e8;         /* Background/disabled — подложка иконок групп уведомлений */
+    --bg-success-main:#00be70;     /* Background/success-main — Wobbler mini "Новое" */
     --stroke-light:#eeeeee;
     --stroke-indicator:#f7f7f7;
     /* Gradient/Primary Button + hover/pressed (controls-hover-orange) */
@@ -451,92 +454,73 @@
   /* Scroll body */
   .m-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
-  /* Tabs */
-  .m-tabs{
-    display:flex;gap:var(--s-small);
-    padding:var(--s-large);
-    position:sticky;top:0;z-index:2;
-    background:var(--bg-primary);
+  /* ===== Группы уведомлений (Центр уведомлений) ===== */
+  .ngroup-list{display:flex;flex-direction:column;}
+  .ngroup{
+    display:flex;align-items:center;gap:var(--s-medium);
+    height:64px;flex-shrink:0;
+    padding:var(--s-small) var(--s-large);
+    cursor:pointer;transition:background .15s ease;
   }
-  .tab{
-    flex:1;min-width:0;
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    padding:8px 12px;border-radius:8px;border:none;cursor:pointer;
-    font-family:inherit;font-size:16px;line-height:20px;font-weight:400;
-    color:var(--text-primary);background:rgba(0,0,0,0.03);
+  .ngroup:hover{background:rgba(0,0,0,0.03);}
+  .ngroup__icon{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    background:var(--bg-disabled);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  .ngroup__icon img{width:44px;height:44px;display:block;}
+  .ngroup__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .ngroup__top{display:flex;align-items:center;gap:6px;height:24px;}
+  .ngroup__title{
+    flex:0 1 auto;min-width:0;font-size:16px;line-height:1.4;color:var(--text-primary);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .ngroup__time{flex-shrink:0;margin-left:auto;font-size:14px;line-height:1.3;color:var(--text-tertiary);white-space:nowrap;}
+  .ngroup__bottom{display:flex;align-items:center;gap:var(--s-medium);height:22px;}
+  .ngroup__preview{
+    flex:1;min-width:0;font-size:14px;line-height:1.3;color:var(--text-tertiary);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  /* Счётчик непрочитанных — Notification Badge Container */
+  .ngroup__count{
+    flex-shrink:0;background:var(--bg-secondary);color:var(--text-brand);
+    font-weight:700;font-size:12px;line-height:1.3;
+    padding:3px 4px;border-radius:19px;
+  }
+  /* Wobbler mini (color=green) — акционный лейбл "Новое" */
+  .ngroup__wobbler{
+    flex-shrink:0;background:var(--bg-success-main);color:#fff;
+    font-weight:700;font-size:10px;line-height:9px;text-transform:uppercase;
+    padding:4px;border-radius:4px;
+  }
+
+  /* ===== Детальный экран группы (второй уровень: клик по группе) ===== */
+  .odetail{display:flex;flex-direction:column;padding-bottom:var(--s-xxl);}
+  .odate{padding:var(--s-large) var(--s-large) var(--s-small);font-size:14px;line-height:1.3;color:var(--text-tertiary);}
+  .ocard{
+    background:var(--bg-secondary);border-radius:var(--r-lg);
+    margin:0 var(--s-large) var(--s-medium);
+    padding:var(--s-xxl) var(--s-medium);
+    box-shadow:var(--shadow-plate);
+    display:flex;flex-direction:column;gap:var(--s-medium);
+  }
+  .ocard__title{font-size:16px;line-height:1.4;color:var(--text-primary);}
+  .ocard__title--bold{font-weight:700;}
+  .ocard__row{display:flex;gap:var(--s-medium);align-items:flex-start;}
+  .ocard__icon{width:44px;height:44px;flex-shrink:0;display:block;}
+  .ocard__text{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+  .ocard__amount{font-size:16px;font-weight:700;line-height:1.3;color:var(--text-primary);}
+  .ocard__note{font-size:14px;line-height:1.4;color:var(--text-secondary);}
+  .ocard__btn{
+    width:100%;border:none;border-radius:var(--r-sm);background:var(--bg-primary);
+    color:var(--text-primary);font-family:inherit;font-size:16px;line-height:1.3;
+    padding:14px var(--s-large);cursor:pointer;
     transition:background .15s ease, box-shadow .15s ease;
   }
-  .tab:hover{background:rgba(0,0,0,0.06);}
-  .tab--active{
-    background:var(--bg-secondary);font-weight:700;
-    box-shadow:0px 5px 14px 0px rgba(0,0,0,0.11),0px 2px 1px 0px rgba(0,0,0,0.05);
-  }
-  .tab--active:hover{background:var(--bg-secondary);}
-  .tab__badge{
-    background:var(--icon-brand-main);color:#fff;
-    font-weight:700;font-size:13px;line-height:1;
-    padding:2px 4px;border-radius:50px;
-  }
+  .ocard__btn:hover{background:var(--controls-hover-gray);box-shadow:var(--gray-shadow);}
+  .ocard__btn:active{background:var(--controls-active-gray);box-shadow:none;}
 
-  /* Date row + trash */
-  .m-daterow{display:flex;align-items:center;justify-content:space-between;padding:0 var(--s-large);}
-  .m-date{font-size:14px;line-height:20px;color:var(--text-tertiary);}
-  .m-trash{
-    background:none;cursor:pointer;padding:8px;
-    border-top:1px solid var(--stroke-light);
-    border-bottom:1px solid var(--stroke-light);
-    border-left:none;border-right:none;
-    display:inline-flex;align-items:center;justify-content:center;
-    transition:opacity .15s ease;
-  }
-  .m-trash:hover{opacity:.6;}
-
-  /* Notification list */
-  .m-list{display:flex;flex-direction:column;gap:12px;padding:12px var(--s-large) var(--s-xxl);}
-
-  .ncard{
-    background:var(--bg-secondary);
-    border-radius:12px;
-    box-shadow:0px 1px 1px 0px rgba(0,0,0,0.1);
-    padding:20px;
-    display:flex;flex-direction:column;gap:8px;
-  }
-  .ncard__header{display:flex;align-items:flex-start;gap:8px;}
-  .ncard__title{font-size:14px;line-height:1.2;color:var(--text-primary);}
-  .ncard__dot{width:6px;height:6px;border-radius:50%;background:var(--icon-brand-main);margin-top:6px;flex-shrink:0;}
-  .ncard__close{
-    margin-left:auto;background:none;border:none;cursor:pointer;padding:0;
-    width:20px;height:20px;flex-shrink:0;
-    display:inline-flex;align-items:center;justify-content:center;
-    border-radius:4px;transition:background .15s ease;
-  }
-  .ncard__close:hover{background:rgba(0,0,0,0.05);}
-  .ncard__body{display:flex;gap:12px;align-items:flex-start;}
-  .ncard__text{font-size:14px;line-height:20px;color:var(--text-primary);}
-  .ncard__text--link{color:var(--text-link);}
-  .ncard__thumb{
-    width:48px;height:48px;flex-shrink:0;
-    border-radius:8px;padding:4px;background:#fff;
-    box-shadow:inset 0px 4px 250px 0px rgba(0,0,0,0.04);
-  }
-  .ncard__thumb img{width:40px;height:40px;object-fit:cover;display:block;border-radius:4px;}
-  .ncard__link{
-    display:inline-flex;align-items:center;gap:4px;
-    color:var(--text-link);font-size:14px;line-height:20px;text-decoration:none;cursor:pointer;
-  }
-  .ncard__link:hover{text-decoration:underline;}
-  /* White (tertiary) button — UFO color:white size:medium */
-  .btn-white{
-    align-self:flex-start;
-    background:#fff;border:1px solid var(--stroke-light);
-    border-radius:12px;cursor:pointer;font-family:inherit;
-    font-size:14px;line-height:20px;color:var(--text-primary);
-    padding:8px 16px;transition:background .15s ease, box-shadow .15s ease;
-  }
-  .btn-white:hover{background:var(--controls-hover-gray);box-shadow:var(--gray-shadow);}
-  .btn-white:active{background:var(--controls-active-gray);box-shadow:none;}
-
-  /* Empty state (вкладка Сообщения) */
+  /* Empty state (группа без детального макета) */
   .m-empty{
     flex:1;display:flex;align-items:center;justify-content:center;
     padding:40px var(--s-large);text-align:center;
@@ -787,93 +771,133 @@
     <!-- ===== Центр уведомлений (fullscreen mobile modal) ===== -->
     <div class="modal" id="notifModal" role="dialog" aria-modal="true" aria-label="Центр уведомлений">
 
-      <!-- Modal header -->
+      <!-- Modal header: иконка слева и заголовок меняются в зависимости от уровня (список групп / детальный экран) -->
       <div class="m-header">
-        <span style="width:24px;flex-shrink:0" aria-hidden="true"></span>
-        <span class="m-header__title">Центр уведомлений</span>
-        <button class="m-iconbtn" id="notifClose" aria-label="Закрыть">
-          <img src="assets/notif/close-header.svg" style="width:12.17px;height:12.16px" alt="">
+        <button class="m-iconbtn" id="notifBack" aria-label="Закрыть">
+          <img id="notifBackIcon" src="assets/notif-groups/action-close.svg" style="width:24px;height:24px" alt="">
+        </button>
+        <span class="m-header__title" id="notifTitle">Центр уведомлений</span>
+        <button class="m-iconbtn" id="notifMarkAllRead" aria-label="Прочитать всё">
+          <img src="assets/notif-groups/action-select-all.svg" style="width:24px;height:24px" alt="">
         </button>
       </div>
 
       <!-- Scroll body -->
       <div class="m-body">
 
-        <!-- Tabs -->
-        <div class="m-tabs">
-          <button class="tab" data-tab="messages">Сообщения</button>
-          <button class="tab tab--active" data-tab="notifs">Уведомления <span class="tab__badge">15</span></button>
-        </div>
+        <!-- Уровень 1: список групп уведомлений -->
+        <div class="ngroup-list" id="notifGroupsPanel">
 
-        <!-- Панель: Уведомления -->
-        <div id="panel-notifs">
-          <div class="m-daterow">
-            <span class="m-date">10 марта 2021</span>
-            <button class="m-trash" id="clearAll" aria-label="Очистить всё">
-              <img src="assets/notif/trash.svg" style="width:17.5px;height:19.5px" alt="">
-            </button>
+          <div class="ngroup" data-group="orders">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-orders.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Заказы</span>
+                <span class="ngroup__time">22:14</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">Поделитесь впечатлениями о покупке</p>
+                <span class="ngroup__count">10</span>
+              </div>
+            </div>
           </div>
 
-          <div class="m-list" id="notifList">
-
-            <!-- Карточка 1 -->
-            <div class="ncard">
-              <div class="ncard__header">
-                <span class="ncard__title">Важная новость</span>
-                <span class="ncard__dot"></span>
-                <button class="ncard__close" aria-label="Скрыть">
-                  <img src="assets/notif/close.svg" style="width:10.14px;height:10.14px" alt="">
-                </button>
+          <div class="ngroup" data-group="system">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-bell.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Системные сообщения</span>
+                <span class="ngroup__time">22:14</span>
               </div>
-              <div class="ncard__body">
-                <p class="ncard__text">Уважаемые покупатели! Изменилась схема организации дорожного движения от Партизанского проспект (район ДКЖД) до пересечения улицы...</p>
-              </div>
-              <a class="ncard__link">Читать далее
-                <img src="assets/notif/chevron-down.svg" style="width:9.57px;height:5.29px" alt="">
-              </a>
-            </div>
-
-            <!-- Карточка 2 -->
-            <div class="ncard">
-              <div class="ncard__header">
-                <span class="ncard__title">Ваш отзыв оценили</span>
-                <span class="ncard__dot"></span>
-                <button class="ncard__close" aria-label="Скрыть">
-                  <img src="assets/notif/close.svg" style="width:10.14px;height:10.14px" alt="">
-                </button>
-              </div>
-              <div class="ncard__body">
-                <span class="ncard__thumb"><img src="assets/notif/thumb1.png" alt=""></span>
-                <p class="ncard__text ncard__text--link">8" Планшет Huawei MediaPad T3 16 ГБ 3G, LTE серый</p>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">Поделитесь впечатлениями о покупке</p>
               </div>
             </div>
-
-            <!-- Дата -->
-            <div class="m-daterow"><span class="m-date">9 марта 2021</span></div>
-
-            <!-- Карточка 3 -->
-            <div class="ncard">
-              <div class="ncard__header">
-                <span class="ncard__title">Ранее вы оценивали товар</span>
-                <span class="ncard__dot"></span>
-                <button class="ncard__close" aria-label="Скрыть">
-                  <img src="assets/notif/close.svg" style="width:10.14px;height:10.14px" alt="">
-                </button>
-              </div>
-              <div class="ncard__body">
-                <span class="ncard__thumb"><img src="assets/notif/thumb2.png" alt=""></span>
-                <p class="ncard__text"><span class="ncard__text--link">8" Планшет Huawei MediaPad T3 16 ГБ 3G, LTE серый</span>, возможно, вам есть что рассказать.</p>
-              </div>
-              <button class="btn-white">Оценить товар</button>
-            </div>
-
           </div>
+
+          <div class="ngroup" data-group="subscriptions">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-like.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Мои подписки</span>
+                <span class="ngroup__time">22:14</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">В подписке "Ноутбуки по 5"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="ngroup" data-group="cart">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-cart.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Корзина и избранное</span>
+                <span class="ngroup__time">22:14</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">В подписке "Ноутбуки по 5"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="ngroup" data-group="recommendations">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-stars.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Рекомендации</span>
+                <span class="ngroup__time">25.11.2024</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">У нас отличная новость, товары которые вы смотрели подешевели</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="ngroup" data-group="sale">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-sale.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Скидки и акции</span>
+                <span class="ngroup__wobbler">Новое</span>
+                <span class="ngroup__time">22:14</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">Снизилась цена на товар из избранного</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="ngroup" data-group="chatbot">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-chatbot.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Чат-бот (AI)</span>
+                <span class="ngroup__time">22:14</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">Виртуальный помощник</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="ngroup" data-group="club">
+            <span class="ngroup__icon"><img src="assets/notif-groups/icon-clubcoin.png" alt=""></span>
+            <div class="ngroup__body">
+              <div class="ngroup__top">
+                <span class="ngroup__title">Клуб DNS</span>
+                <span class="ngroup__time">22:14</span>
+              </div>
+              <div class="ngroup__bottom">
+                <p class="ngroup__preview">У вашей статьи 3 новые оценки</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Панель: Сообщения (empty state) -->
-        <div id="panel-messages" class="m-hidden">
-          <div class="m-empty">Новых сообщений нет</div>
-        </div>
+        <!-- Уровень 2: детальный экран группы (заполняется в JS по клику на группу) -->
+        <div class="odetail m-hidden" id="notifDetailPanel"></div>
 
       </div>
     </div>
@@ -883,30 +907,144 @@
 
   <script>
     (function(){
-      var modal = document.getElementById('notifModal');
-      document.getElementById('notifBtn').addEventListener('click', function(){ modal.classList.add('open'); });
-      document.getElementById('notifClose').addEventListener('click', function(){ modal.classList.remove('open'); });
-      document.addEventListener('keydown', function(e){ if(e.key==='Escape') modal.classList.remove('open'); });
+      var modal         = document.getElementById('notifModal');
+      var groupsPanel   = document.getElementById('notifGroupsPanel');
+      var detailPanel   = document.getElementById('notifDetailPanel');
+      var titleEl       = document.getElementById('notifTitle');
+      var backBtn       = document.getElementById('notifBack');
+      var backIcon      = document.getElementById('notifBackIcon');
+      var modalBody     = modal.querySelector('.m-body');
 
-      // Переключение табов
-      var tabs = modal.querySelectorAll('.tab');
-      var panels = { notifs: document.getElementById('panel-notifs'), messages: document.getElementById('panel-messages') };
-      tabs.forEach(function(t){
-        t.addEventListener('click', function(){
-          tabs.forEach(function(x){ x.classList.remove('tab--active'); });
-          t.classList.add('tab--active');
-          Object.keys(panels).forEach(function(k){ panels[k].classList.toggle('m-hidden', k !== t.dataset.tab); });
+      /** Контент второго уровня (детальный экран группы). Пока есть только для «Заказы» —
+       * для остальных групп показывается пустое состояние (макет для них не предоставлен). */
+      var GROUP_DETAILS = {
+        orders: {
+          sections: [
+            { date: '19 июня 2026', cards: [
+              { icon: 'icon-order-success.png', title: 'Уведомление по заказу',
+                text: 'Заказ 6А-007097147 (19 298 руб.) оплачен и готов к выдаче. Хранение до 03.07.2026 21:00. Код DNS: 7783.',
+                button: 'Перейти к заказу' },
+            ]},
+            { date: '18 июня 2026', cards: [
+              { icon: 'icon-order-transit.png', title: 'Уведомление по заказу',
+                text: 'Заказ 6А-007097147 (19 298 руб.) оплачен и в пути на магазин. Дата готовности 19.06.2026. Хранение до 14 суток с даты готовности. Код DNS: 7783',
+                button: 'Перейти к заказу' },
+            ]},
+            { date: '06 апреля 2026', cards: [
+              { icon: 'icon-order-discount.png', titleBold: 'Заказ 6А-003871870 стал дешевле!',
+                amount: 'Итого - 16 295 ₽',
+                text: 'Скидки действительны при оплате на кассе в магазине. Вы можете отказаться от скидки в магазине',
+                button: 'Перейти к заказу' },
+            ]},
+          ],
+        },
+      };
+
+      function renderDetail(groupId){
+        var data = GROUP_DETAILS[groupId];
+        detailPanel.innerHTML = '';
+        if(!data){
+          detailPanel.innerHTML = '<div class="m-empty">Здесь пока нет уведомлений</div>';
+          return;
+        }
+        data.sections.forEach(function(section){
+          var dateEl = document.createElement('div');
+          dateEl.className = 'odate';
+          dateEl.textContent = section.date;
+          detailPanel.appendChild(dateEl);
+
+          section.cards.forEach(function(card){
+            var el = document.createElement('div');
+            el.className = 'ocard';
+
+            var titleEl2 = document.createElement('p');
+            titleEl2.className = card.titleBold ? 'ocard__title ocard__title--bold' : 'ocard__title';
+            titleEl2.textContent = card.titleBold || card.title;
+            el.appendChild(titleEl2);
+
+            var row = document.createElement('div');
+            row.className = 'ocard__row';
+
+            var icon = document.createElement('img');
+            icon.className = 'ocard__icon';
+            icon.src = 'assets/notif-groups/' + card.icon;
+            icon.alt = '';
+            row.appendChild(icon);
+
+            var textWrap = document.createElement('div');
+            textWrap.className = 'ocard__text';
+            if(card.amount){
+              var amountEl = document.createElement('p');
+              amountEl.className = 'ocard__amount';
+              amountEl.textContent = card.amount;
+              textWrap.appendChild(amountEl);
+            }
+            var noteEl = document.createElement('p');
+            noteEl.className = 'ocard__note';
+            noteEl.textContent = card.text;
+            textWrap.appendChild(noteEl);
+            row.appendChild(textWrap);
+
+            el.appendChild(row);
+
+            var btn = document.createElement('button');
+            btn.className = 'ocard__btn';
+            btn.textContent = card.button;
+            el.appendChild(btn);
+
+            detailPanel.appendChild(el);
+          });
+        });
+      }
+
+      /** Переход на уровень 2 — детальный экран конкретной группы уведомлений */
+      function showDetailView(groupId, title){
+        groupsPanel.classList.add('m-hidden');
+        detailPanel.classList.remove('m-hidden');
+        titleEl.textContent = title;
+        backIcon.src = 'assets/arrow-left.svg';
+        backIcon.style.width = '16px';
+        backIcon.style.height = '13.95px';
+        backBtn.setAttribute('aria-label', 'Назад');
+        renderDetail(groupId);
+        modalBody.scrollTop = 0;
+      }
+
+      /** Возврат на уровень 1 — список групп уведомлений */
+      function showGroupsView(){
+        groupsPanel.classList.remove('m-hidden');
+        detailPanel.classList.add('m-hidden');
+        titleEl.textContent = 'Центр уведомлений';
+        backIcon.src = 'assets/notif-groups/action-close.svg';
+        backIcon.style.width = '24px';
+        backIcon.style.height = '24px';
+        backBtn.setAttribute('aria-label', 'Закрыть');
+      }
+
+      function closeModal(){
+        modal.classList.remove('open');
+        showGroupsView();   // сброс на список групп к следующему открытию
+      }
+
+      document.getElementById('notifBtn').addEventListener('click', function(){ modal.classList.add('open'); });
+      backBtn.addEventListener('click', function(){
+        if(detailPanel.classList.contains('m-hidden')){ closeModal(); }  // на уровне 1 — закрыть модалку
+        else { showGroupsView(); }                                       // на уровне 2 — назад к списку групп
+      });
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+      // Клик по группе уведомлений — провалиться на уровень 2 (детальный список этой группы)
+      groupsPanel.querySelectorAll('.ngroup').forEach(function(g){
+        g.addEventListener('click', function(){
+          var title = g.querySelector('.ngroup__title').textContent;
+          showDetailView(g.dataset.group, title);
         });
       });
 
-      // Скрытие отдельной карточки
-      modal.querySelectorAll('.ncard__close').forEach(function(btn){
-        btn.addEventListener('click', function(){ btn.closest('.ncard').remove(); });
-      });
-
-      // Очистить всё
-      document.getElementById('clearAll').addEventListener('click', function(){
-        document.getElementById('notifList').querySelectorAll('.ncard').forEach(function(c){ c.remove(); });
+      // Прочитать всё — у групп со счётчиком/лейблом «Новое» бейдж исчезает
+      document.getElementById('notifMarkAllRead').addEventListener('click', function(e){
+        e.stopPropagation();
+        groupsPanel.querySelectorAll('.ngroup__count, .ngroup__wobbler').forEach(function(badge){ badge.remove(); });
       });
 
       // ===== Перевод в PZP → loading 3с → Alert (warning) под ссылкой =====
